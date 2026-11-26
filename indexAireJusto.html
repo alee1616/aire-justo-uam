@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aire Justo UAM</title>
+<meta name="description" content="Aire Justo UAM: estado de los aires acondicionados por aula, avisos a encargados y soporte, y resultados del piloto.">
+<meta name="theme-color" content="#0B5F58">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   1. COLORES Y TEMAS
+   ========================================================= */
+:root{
+  --bg:#F1FAF8; --surface:#FFFFFF; --surface-2:#E6F6F2; --text:#0E2926; --muted:#45625D; --line:#CFE8E2;
+  --primary:#0D9488; --primary-strong:#0B7268; --primary-ink:#FFFFFF; --accent:#2DD4BF; --bar-1:#7FD8CB; --bar-2:#0B7268;
+  --ok:#166534; --ok-bg:#DCFCE7; --warn:#8A4B06; --warn-bg:#FEF3C7; --bad:#B42318; --bad-bg:#FEE4E2; --none:#475467; --none-bg:#EAECF0;
+  --hero-1:#073F3A; --hero-2:#0B6B62; --hero-3:#0F8F82;
+  --radius:20px; --radius-sm:12px; --border-w:1px;
+  --shadow:0 1px 2px rgba(10,60,55,.06),0 10px 30px rgba(10,60,55,.08);
+  --shadow-hover:0 4px 10px rgba(10,60,55,.10),0 18px 40px rgba(10,60,55,.14);
+  --focus:0 0 0 3px var(--surface),0 0 0 6px #F59E0B;
+}
+[data-theme="dark"]{
+  --bg:#071C1A; --surface:#0E2A27; --surface-2:#123632; --text:#E7F6F3; --muted:#A6C6C0; --line:#1F4A45;
+  --primary:#2DD4BF; --primary-strong:#5EEAD4; --primary-ink:#04211E; --bar-1:#2A7F75; --bar-2:#5EEAD4;
+  --ok:#86EFAC; --ok-bg:#0F3320; --warn:#FCD34D; --warn-bg:#3A2C08; --bad:#FDA29B; --bad-bg:#3D1512; --none:#D0D5DD; --none-bg:#1D2939;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); --shadow-hover:0 4px 10px rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.45);
+}
+[data-contrast="alto"]{--text:#000;--muted:#111;--line:#000;--primary-strong:#00463F;--border-w:2px;--bar-1:#4BA99D;--bar-2:#00463F}
+[data-theme="dark"][data-contrast="alto"]{--text:#FFF;--muted:#FFF;--line:#FFF;--primary-strong:#99F6E4;--bar-2:#99F6E4}
+
+/* =========================================================
+   2. BASE
+   ========================================================= */
+*{box-sizing:border-box}
+body{margin:0;font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+h1,h2,h3{line-height:1.2;margin:0}
+a{color:var(--primary-strong)}
+[hidden]{display:none!important}
+:focus-visible{outline:none;box-shadow:var(--focus);border-radius:10px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:-999px;top:8px;background:var(--primary-strong);color:var(--primary-ink);padding:10px 16px;border-radius:10px;z-index:100;font-weight:700}
+.skip:focus{left:12px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* =========================================================
+   3. BOTONES (con animación)
+   ========================================================= */
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:700;font-size:.92rem;border-radius:12px;padding:11px 16px;border:var(--border-w) solid transparent;cursor:pointer;transition:transform .18s,box-shadow .18s,background .2s,color .2s;min-height:44px;text-decoration:none}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn:disabled{opacity:.6;cursor:default;transform:none;box-shadow:none}
+.btn-primary{background:var(--primary-strong);color:var(--primary-ink)}
+.btn-ghost{background:var(--surface-2);color:var(--text);border-color:var(--line)}
+.btn-wa{background:#128C4A;color:#fff}
+[data-theme="dark"] .btn-wa{background:#25D366;color:#04210F}
+.btn-sm{padding:8px 12px;min-height:40px;font-size:.86rem}
+.btn svg{flex:none}
+.ripple{position:absolute;border-radius:50%;transform:scale(0);background:currentColor;opacity:.25;animation:ripple .6s ease-out;pointer-events:none}
+@keyframes ripple{to{transform:scale(4);opacity:0}}
+.girando svg{animation:girar 1s linear infinite}
+@keyframes girar{to{transform:rotate(360deg)}}
+
+/* =========================================================
+   4. PANTALLA DE INICIO DE SESIÓN
+   ========================================================= */
+.login{min-height:100vh;display:grid;grid-template-columns:1.05fr 1fr}
+.login-arte{background:radial-gradient(900px 500px at 80% 0%,rgba(45,212,191,.35),transparent 60%),linear-gradient(150deg,var(--hero-1),var(--hero-2) 55%,var(--hero-3));color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.login-arte::before,.login-arte::after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.15)}
+.login-arte::before{width:520px;height:520px;right:-180px;bottom:-200px;animation:flotar 9s ease-in-out infinite}
+.login-arte::after{width:320px;height:320px;right:-60px;bottom:-80px;animation:flotar 7s ease-in-out infinite reverse}
+@keyframes flotar{50%{transform:translateY(-14px)}}
+.login-arte h1{font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-.03em}
+.login-arte h1 span{color:#99F6E4}
+.login-arte .lema{font-size:1.1rem;opacity:.92;max-width:440px;margin-top:12px}
+.puntos{list-style:none;padding:0;margin:28px 0 0;display:grid;gap:14px;max-width:440px;position:relative;z-index:1}
+.puntos li{display:flex;gap:12px;align-items:flex-start;opacity:.95}
+.puntos .pi{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.14);display:grid;place-items:center;flex:none}
+.login-lado{display:grid;place-items:center;padding:32px 20px}
+.login-card{width:100%;max-width:420px;padding:32px}
+.login-card h2{font-size:1.6rem;font-weight:800;letter-spacing:-.02em}
+.login-card .sub{color:var(--muted);margin:6px 0 22px}
+.campo{display:grid;gap:6px;margin-bottom:16px}
+.campo label{font-weight:700;font-size:.9rem}
+.input{display:flex;align-items:center;gap:8px;border:var(--border-w) solid var(--line);background:var(--bg);border-radius:12px;padding:0 12px;transition:border-color .2s,box-shadow .2s}
+.input:focus-within{border-color:var(--primary);box-shadow:0 0 0 4px rgba(13,148,136,.18)}
+.input input{flex:1;border:0;background:transparent;color:var(--text);font:inherit;padding:12px 0;min-height:46px;outline:none}
+.input .ojo{border:0;background:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:8px}
+.error-login{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 12px;font-weight:600;font-size:.9rem;margin-bottom:14px}
+.agitar{animation:agitar .4s}
+@keyframes agitar{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.demo-cuentas{margin-top:22px;border-top:var(--border-w) dashed var(--line);padding-top:18px}
+.demo-cuentas p{font-size:.85rem;color:var(--muted);margin:0 0 10px}
+.cuentas{display:grid;gap:8px}
+.cuenta{display:flex;align-items:center;gap:10px;text-align:left;font:inherit;width:100%;background:var(--surface-2);border:var(--border-w) solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px;cursor:pointer;transition:transform .18s,border-color .2s}
+.cuenta:hover{transform:translateX(4px);border-color:var(--primary)}
+.cuenta .ca{width:34px;height:34px;border-radius:10px;background:var(--primary-strong);color:var(--primary-ink);display:grid;place-items:center;font-weight:800;font-size:.8rem;flex:none}
+.cuenta small{display:block;color:var(--muted)}
+.nota-sim{font-size:.8rem;color:var(--muted);margin-top:16px;display:flex;gap:6px}
+
+/* =========================================================
+   5. BARRA SUPERIOR DE LA APP
+   ========================================================= */
+.appbar{background:linear-gradient(135deg,var(--hero-1),var(--hero-2));color:#fff;position:sticky;top:0;z-index:20;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.appbar .wrap{display:flex;align-items:center;gap:16px;min-height:68px}
+.marca{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;font-size:1.15rem;letter-spacing:-.01em;white-space:nowrap}
+.marca span{color:#99F6E4}
+.logo{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.14);display:grid;place-items:center;border:1px solid rgba(255,255,255,.25)}
+.nav{display:flex;gap:4px;margin-left:12px}
+.nav a{white-space:nowrap;color:#fff;text-decoration:none;font-weight:600;font-size:.92rem;padding:9px 12px;border-radius:10px;opacity:.85;transition:background .2s,opacity .2s;display:inline-flex;align-items:center;gap:7px}
+.nav a:hover{background:rgba(255,255,255,.12);opacity:1}
+.nav a[aria-current="page"]{background:#fff;color:var(--hero-1);opacity:1}
+.derecha{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);color:#fff;display:grid;place-items:center;cursor:pointer;transition:transform .2s,background .2s;position:relative}
+.icon-btn:hover{background:rgba(255,255,255,.22);transform:translateY(-1px)}
+.usuario{display:flex;align-items:center;gap:10px;padding:4px 6px 4px 4px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25)}
+.avatar{width:34px;height:34px;border-radius:50%;background:#99F6E4;color:var(--hero-1);display:grid;place-items:center;font-weight:800;font-size:.85rem}
+.usuario .nm{font-size:.85rem;line-height:1.2;padding-right:6px}
+.usuario .nm small{display:block;opacity:.8}
+.menu-acc{position:absolute;right:0;top:50px;background:var(--surface);color:var(--text);border:var(--border-w) solid var(--line);border-radius:16px;box-shadow:var(--shadow-hover);padding:8px;width:240px;z-index:30;animation:aparecer .2s}
+.menu-acc button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;background:none;border:0;color:var(--text);font:inherit;font-weight:600;padding:11px 12px;border-radius:10px;cursor:pointer;text-align:left}
+.menu-acc button:hover{background:var(--surface-2)}
+.menu-acc .estadoSw{font-size:.78rem;font-weight:700;color:var(--primary-strong)}
+.tabbar{display:none}
+
+/* =========================================================
+   6. CONTENIDO Y ENCABEZADO DE CADA SECCIÓN
+   ========================================================= */
+main{padding:28px 0 60px;min-height:calc(100vh - 140px)}
+.vista-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.miga{font-size:.85rem;color:var(--muted);margin-bottom:6px;display:flex;gap:6px;align-items:center}
+.miga a{color:var(--muted);text-decoration:none}
+.miga a:hover{color:var(--primary-strong)}
+.vista-head h1{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-.02em}
+.vista-head p{margin:6px 0 0;color:var(--muted)}
+.estado-datos{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.dot{width:10px;height:10px;border-radius:50%;background:#22C55E;animation:pulso 2s infinite}
+.dot.demo{background:#F59E0B}
+@keyframes pulso{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 9px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.aviso{display:flex;gap:12px;align-items:flex-start;border-radius:var(--radius-sm);padding:14px 16px;margin:0 0 20px;border:var(--border-w) solid;font-size:.93rem}
+.aviso.demo{background:var(--warn-bg);color:var(--warn);border-color:currentColor}
+.aviso.error{background:var(--bad-bg);color:var(--bad);border-color:currentColor}
+.aviso strong{display:block}
+.card{background:var(--surface);border:var(--border-w) solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:.78rem;font-weight:700;border-radius:999px;padding:3px 9px}
+.chip.ok{background:var(--ok-bg);color:var(--ok)} .chip.bad{background:var(--bad-bg);color:var(--bad)} .chip.warn{background:var(--warn-bg);color:var(--warn)} .chip.neutro{background:var(--none-bg);color:var(--none)}
+.entrar{opacity:0;transform:translateY(14px);animation:entrar .5s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes entrar{to{opacity:1;transform:none}}
+@keyframes aparecer{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+
+/* =========================================================
+   7. INICIO: saludo, resumen y botones grandes
+   ========================================================= */
+.saludo{background:radial-gradient(700px 260px at 90% 0%,rgba(45,212,191,.35),transparent 60%),linear-gradient(135deg,var(--hero-1),var(--hero-3));color:#fff;border-radius:24px;padding:28px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:22px;box-shadow:var(--shadow)}
+.saludo h1{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:800;letter-spacing:-.02em}
+.saludo p{margin:6px 0 0;opacity:.92;max-width:560px}
+.saludo .rol{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:5px 12px;border-radius:999px;font-weight:700;font-size:.82rem;margin-bottom:10px}
+.resumen{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:28px}
+.kpi{padding:18px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:4px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+.kpi.k-bad::before{background:var(--bad)} .kpi.k-warn::before{background:#D97706}
+.kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover)}
+.kpi .etq{font-size:.84rem;font-weight:600;color:var(--muted)}
+.kpi .valor{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin-top:6px}
+.kpi .sub{font-size:.82rem;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.tile{display:flex;flex-direction:column;gap:14px;padding:22px;text-decoration:none;color:var(--text);position:relative;overflow:hidden}
+.tile:hover{transform:translateY(-5px);box-shadow:var(--shadow-hover);border-color:var(--primary)}
+.tile .ti{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;display:grid;place-items:center;transition:transform .3s}
+.tile:hover .ti{transform:rotate(-6deg) scale(1.08)}
+.tile h2{font-size:1.15rem;font-weight:800}
+.tile p{margin:0;color:var(--muted);font-size:.92rem}
+.tile .ir{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--primary-strong);font-size:.9rem;margin-top:auto}
+.tile .ir svg{transition:transform .25s}
+.tile:hover .ir svg{transform:translateX(5px)}
+.tile .badge{position:absolute;top:18px;right:18px}
+
+/* =========================================================
+   8. AULAS
+   ========================================================= */
+.barra-filtros{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.filtros{display:flex;gap:8px;flex-wrap:wrap}
+.filtro{font:inherit;font-weight:600;font-size:.88rem;border-radius:999px;padding:8px 16px;border:var(--border-w) solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;min-height:40px;transition:all .2s}
+.filtro:hover{border-color:var(--primary);transform:translateY(-1px)}
+.filtro[aria-pressed="true"]{background:var(--primary-strong);color:var(--primary-ink);border-color:var(--primary-strong)}
+.leyenda{display:flex;gap:12px;flex-wrap:wrap;font-size:.84rem;color:var(--muted)}
+.leyenda span{display:inline-flex;align-items:center;gap:6px}
+.aulas{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.aula{padding:20px;display:flex;flex-direction:column;gap:14px;border-left:6px solid var(--none)}
+.aula:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
+.aula.s-ok{border-left-color:var(--ok)} .aula.s-warn{border-left-color:#D97706} .aula.s-bad{border-left-color:var(--bad)}
+.aula-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.aula h2{font-size:1.6rem;font-weight:800;letter-spacing:-.02em}
+.lugar{color:var(--muted);font-size:.85rem}
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:.85rem;border-radius:999px;padding:6px 12px;white-space:nowrap}
+.p-ok{background:var(--ok-bg);color:var(--ok)} .p-warn{background:var(--warn-bg);color:var(--warn)} .p-bad{background:var(--bad-bg);color:var(--bad)} .p-none{background:var(--none-bg);color:var(--none)}
+.p-bad svg{animation:latido 1.6s ease-in-out infinite}
+@keyframes latido{50%{transform:scale(1.18)}}
+.ficha{font-size:.85rem;color:var(--muted);background:var(--surface-2);border-radius:10px;padding:8px 12px}
+.ficha b{color:var(--text)}
+.datos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dato{background:var(--bg);border:var(--border-w) solid var(--line);border-radius:12px;padding:10px 12px}
+.dato small{display:block;color:var(--muted);font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.dato span{font-weight:700;font-size:.95rem}
+.que-hacer{border-radius:12px;padding:10px 12px;font-size:.9rem;font-weight:600;display:flex;gap:8px;align-items:flex-start}
+.que-hacer.espera,.chip.espera{background:#E0ECFB;color:#1E4E8C} [data-theme="dark"] .que-hacer.espera,[data-theme="dark"] .chip.espera{background:#10243F;color:#9EC5FE}
+.que-hacer.bad{background:var(--bad-bg);color:var(--bad)} .que-hacer.warn{background:var(--warn-bg);color:var(--warn)} .que-hacer.ok{background:var(--ok-bg);color:var(--ok)}
+.acciones{display:flex;gap:10px;flex-wrap:wrap}
+.acciones .btn{flex:1 1 140px}
+
+/* =========================================================
+   9. REPORTES
+   ========================================================= */
+.lista{padding:6px 0}
+.rep{display:flex;gap:14px;padding:16px 20px;border-bottom:var(--border-w) solid var(--line);align-items:flex-start;flex-wrap:wrap}
+.rep:last-child{border-bottom:0}
+.rep .av{width:46px;height:46px;border-radius:14px;background:var(--surface-2);color:var(--primary-strong);display:grid;place-items:center;font-weight:800;font-size:.78rem;flex:none}
+.rep .cuerpo{flex:1 1 220px;min-width:0}
+.rep .cuando{font-size:.8rem;color:var(--muted)}
+.rep .tags{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.rep .coment{font-size:.88rem;color:var(--muted);font-style:italic;overflow-wrap:anywhere}
+.rep .acc{display:flex;gap:8px;flex-wrap:wrap}
+.rep.atendido{opacity:.62}
+.vacio{padding:36px 20px;text-align:center;color:var(--muted)}
+.vacio svg{color:var(--primary);margin-bottom:8px}
+
+/* =========================================================
+   10. EQUIPOS Y RESULTADOS
+   ========================================================= */
+.tabla-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:12px 14px;border-bottom:var(--border-w) solid var(--line);white-space:nowrap}
+th{font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:var(--surface-2)}
+tbody tr{transition:background .2s}
+tbody tr:hover{background:var(--surface-2)}
+.grafico{padding:22px}
+.g-leyenda{display:flex;gap:18px;flex-wrap:wrap;font-size:.88rem;color:var(--muted);margin-bottom:16px}
+.g-leyenda i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
+.g-fila{display:grid;grid-template-columns:90px 1fr;gap:14px;align-items:center;padding:10px 0;border-bottom:var(--border-w) solid var(--line)}
+.g-fila:last-child{border-bottom:0}
+.g-fila .nom{font-weight:800}
+.barras{display:grid;gap:8px}
+.barra{display:grid;grid-template-columns:1fr 54px;align-items:center;gap:10px}
+.pista{height:22px;background:var(--surface-2);border-radius:999px;overflow:hidden}
+.relleno{height:100%;width:0;border-radius:999px;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.r1 .relleno{background:var(--bar-1)} .r2 .relleno{background:var(--bar-2)}
+.barra output{font-weight:800;font-size:.92rem;text-align:right}
+.g-nota{font-size:.88rem;color:var(--muted);margin:14px 0 0}
+.dos{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-top:18px}
+details{border:var(--border-w) solid var(--line);border-radius:14px;padding:4px 16px;margin-bottom:10px;background:var(--bg)}
+details[open]{background:var(--surface)}
+summary{cursor:pointer;font-weight:700;padding:12px 0;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.3rem;color:var(--primary-strong);transition:transform .25s}
+details[open] summary::after{transform:rotate(45deg)}
+details p,details ol,details ul{margin:0 0 14px;color:var(--muted);font-size:.93rem}
+.formula{font-family:ui-monospace,Consolas,monospace;background:var(--surface-2);padding:10px 12px;border-radius:10px;color:var(--text);font-size:.85rem;display:block}
+
+/* =========================================================
+   11. VENTANA DE DETALLE, MENSAJE FLOTANTE Y PIE
+   ========================================================= */
+dialog{border:0;padding:0;border-radius:24px;max-width:760px;width:calc(100% - 32px);background:var(--surface);color:var(--text);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(4,30,27,.55);backdrop-filter:blur(3px)}
+dialog[open]{animation:aparecer .28s cubic-bezier(.2,.8,.2,1)}
+.d-head{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:var(--border-w) solid var(--line);position:sticky;top:0;background:var(--surface)}
+.d-body{padding:18px 22px 24px}
+.cerrar{width:44px;height:44px;border-radius:12px;border:var(--border-w) solid var(--line);background:var(--surface-2);color:var(--text);cursor:pointer;display:grid;place-items:center;transition:transform .2s}
+.cerrar:hover{transform:rotate(90deg)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:var(--text);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;box-shadow:var(--shadow-hover);transition:transform .35s cubic-bezier(.2,.8,.2,1),visibility .35s;z-index:60;visibility:hidden}
+.toast.ver{transform:translateX(-50%) translateY(0);visibility:visible}
+footer{border-top:var(--border-w) solid var(--line);padding:22px 0 30px;color:var(--muted);font-size:.85rem}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* =========================================================
+   12. CELULAR
+   ========================================================= */
+@media (max-width:900px){
+  .login{grid-template-columns:1fr}
+  .login-arte{padding:32px 24px;min-height:auto}
+  .puntos{display:none}
+  .nav{display:none}
+  .usuario .nm{display:none}
+  .tabbar{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:var(--border-w) solid var(--line);z-index:25;box-shadow:0 -6px 20px rgba(0,0,0,.08);padding-bottom:env(safe-area-inset-bottom)}
+  .tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 10px;color:var(--muted);text-decoration:none;font-size:.72rem;font-weight:700}
+  .tabbar a[aria-current="page"]{color:var(--primary-strong)}
+  .tabbar a[aria-current="page"] svg{transform:translateY(-2px)}
+  main{padding-bottom:110px}
+  footer{padding-bottom:90px}
+  .dos{grid-template-columns:1fr}
+}
+@media (max-width:520px){.marca .txt{display:none}.g-fila{grid-template-columns:62px 1fr}.kpi .valor{font-size:1.7rem}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.entrar{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#principal">Saltar al contenido</a>
+
+<!-- =========================================================
+     PANTALLA DE INICIO DE SESIÓN
+     ========================================================= -->
+<div class="login" id="pantallaLogin" hidden>
+  <div class="login-arte">
+    <div>
+      <div class="logo" aria-hidden="true" style="width:56px;height:56px;border-radius:16px;margin-bottom:22px">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 24c0-9 6-15 17-16-1 11-7 17-16 17"/><path d="M9 24c4-4 8-7 12-9"/><path d="M3 9h7a2.5 2.5 0 1 0-2.5-2.5"/><path d="M3 14h4"/></svg>
+      </div>
+      <h1>Aire Justo <span>UAM</span></h1>
+      <p class="lema">El aire justo: encendido cuando hay clase, apagado cuando el aula queda vacía.</p>
+      <ul class="puntos">
+        <li><span class="pi" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5"/></svg></span><span>Ve qué aulas quedaron con el aire encendido al cierre de cada turno.</span></li>
+        <li><span class="pi" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 12a8 8 0 0 1-11.7 7.1L4 20l1-4.1A8 8 0 1 1 20 12z"/></svg></span><span>Avisa por WhatsApp con un clic, con el mensaje ya escrito.</span></li>
+        <li><span class="pi" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z"/></svg></span><span>Prioriza qué aires necesitan revisión o reemplazo.</span></li>
+      </ul>
+    </div>
+    <p style="opacity:.8;font-size:.85rem;position:relative;z-index:1">Proyecto Integrador · Educación Ambiental · Grupo 3 · UAM</p>
+  </div>
+
+  <div class="login-lado">
+    <form class="card login-card" id="formLogin" novalidate>
+      <h2>Iniciar sesión</h2>
+      <p class="sub">Acceso para encargados de los aires, soporte y equipo del proyecto.</p>
+      <div class="error-login" id="errorLogin" role="alert" hidden></div>
+      <div class="campo">
+        <label for="usuario">Usuario</label>
+        <div class="input">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          <input id="usuario" name="usuario" autocomplete="username" required autocapitalize="none" spellcheck="false">
+        </div>
+      </div>
+      <div class="campo">
+        <label for="clave">Contraseña</label>
+        <div class="input">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <input id="clave" name="clave" type="password" autocomplete="current-password" required>
+          <button class="ojo" type="button" id="verClave" aria-label="Mostrar contraseña" aria-pressed="false">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit" style="width:100%;margin-top:6px">
+        Entrar
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+
+      <div class="demo-cuentas">
+        <p>Cuentas de prueba (toca una para llenar los datos):</p>
+        <div class="cuentas" id="cuentasDemo"></div>
+      </div>
+      <p class="nota-sim">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        Inicio de sesión simulado para el prototipo. En una versión oficial se usaría la cuenta institucional de la UAM.
+      </p>
+    </form>
+  </div>
+</div>
+
+<!-- =========================================================
+     APLICACIÓN (después de iniciar sesión)
+     ========================================================= -->
+<div id="app" hidden>
+  <header class="appbar">
+    <div class="wrap">
+      <a class="marca" href="#inicio" aria-label="Aire Justo UAM, ir al inicio">
+        <span class="logo" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 24c0-9 6-15 17-16-1 11-7 17-16 17"/><path d="M9 24c4-4 8-7 12-9"/><path d="M3 9h7a2.5 2.5 0 1 0-2.5-2.5"/><path d="M3 14h4"/></svg></span>
+        <span class="txt">Aire Justo <span>UAM</span></span>
+      </a>
+      <nav class="nav" id="nav" aria-label="Secciones"></nav>
+      <div class="derecha">
+        <button class="icon-btn" id="btnActualizar" type="button" aria-label="Actualizar datos" title="Actualizar datos">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+        </button>
+        <div style="position:relative">
+          <button class="icon-btn" id="btnAcc" type="button" aria-label="Opciones de accesibilidad" aria-expanded="false" aria-controls="menuAcc" title="Accesibilidad">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="4.5" r="1.8"/><path d="M5 8.5l7 1.5 7-1.5M12 10v5l-3 6M12 15l3 6"/></svg>
+          </button>
+          <div class="menu-acc" id="menuAcc" hidden>
+            <button type="button" id="tTexto"><span>Tamaño del texto</span><span class="estadoSw" id="tTextoTxt">Normal</span></button>
+            <button type="button" id="tContraste" aria-pressed="false"><span>Alto contraste</span><span class="estadoSw" id="tContrasteTxt">No</span></button>
+            <button type="button" id="tTema" aria-pressed="false"><span>Modo oscuro</span><span class="estadoSw" id="tTemaTxt">No</span></button>
+          </div>
+        </div>
+        <div class="usuario">
+          <span class="avatar" id="avatar" aria-hidden="true"></span>
+          <span class="nm"><strong id="uNombre"></strong><small id="uRol"></small></span>
+          <button class="icon-btn" id="btnSalir" type="button" aria-label="Cerrar sesión" title="Cerrar sesión" style="width:36px;height:36px;border:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="principal" tabindex="-1">
+    <div class="wrap">
+      <div id="avisos"></div>
+      <div id="vista"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span><strong>Aire Justo UAM</strong> · Grupo 3 · Educación Ambiental · Universidad Americana</span>
+      <span class="estado-datos" aria-live="polite"><span class="dot" id="dot" aria-hidden="true"></span><span id="estadoTxt">Cargando…</span></span>
+    </div>
+  </footer>
+
+  <nav class="tabbar" id="tabbar" aria-label="Secciones (celular)"></nav>
+</div>
+
+<dialog id="detalle" aria-labelledby="dTitulo">
+  <div class="d-head">
+    <h2 id="dTitulo">Detalle</h2>
+    <button class="cerrar" type="button" id="dCerrar" aria-label="Cerrar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="d-body" id="dCuerpo"></div>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   A. CONFIGURACIÓN  (lo que ustedes cambian)
+   ========================================================= */
+const CONFIG = {
+  // Enlaces CSV de "Archivo → Compartir → Publicar en la web". Vacíos = datos de demostración.
+  URL_RONDAS:   '',   // pestaña "Respuestas de formulario 1"
+  URL_REPORTES: '',   // pestaña "Respuestas de formulario 2"
+  URL_FICHAS:   '',   // pestaña "Fichas de aires"
+
+  // WhatsApp con código de país, sin + ni espacios (ej. '50588887777'). Vacío = WhatsApp pregunta a quién enviar.
+  WHATSAPP: { encargadoB: '', encargadoO: '', soporte: '' },
+
+  TARIFA_KWH: 7.77, META_PUNTOS: 10, ACTUALIZAR_CADA_MIN: 2,
+  AULAS: [
+    { codigo: 'B-102', edificio: 'B', piso: 1 },
+    { codigo: 'B-303', edificio: 'B', piso: 3 },
+    { codigo: 'O-201', edificio: 'O', piso: 2 },
+  ],
+
+  // Cuentas de PRUEBA (inicio de sesión simulado; no usar contraseñas reales)
+  USUARIOS: [
+    { usuario: 'encargado.b', clave: 'aire2026', nombre: 'Encargado Edificio B', rol: 'encargado', edificio: 'B' },
+    { usuario: 'encargado.o', clave: 'aire2026', nombre: 'Encargado Edificio O', rol: 'encargado', edificio: 'O' },
+    { usuario: 'soporte',     clave: 'aire2026', nombre: 'Soporte técnico',      rol: 'soporte' },
+    { usuario: 'avisos',      clave: 'aire2026', nombre: 'Responsable de avisos', rol: 'coordinacion' },
+  ],
+};
+
+const ROLES = {
+  encargado:    { nombre: 'Encargado de aires', vistas: ['inicio', 'aulas', 'reportes', 'ayuda'] },
+  soporte:      { nombre: 'Soporte técnico',    vistas: ['inicio', 'equipos', 'reportes', 'aulas', 'ayuda'] },
+  coordinacion: { nombre: 'Responsable de avisos', vistas: ['inicio', 'aulas', 'reportes', 'equipos', 'resultados', 'ayuda'] },
+};
+
+/* Íconos (trazos SVG) */
+const I = {
+  inicio: '<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
+  aulas: '<path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 9h.01M15 9h.01M9 13h.01M15 13h.01M10 21v-4h4v4"/>',
+  reportes: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 20h1M17 20h.01M20 14v3"/>',
+  equipos: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z"/>',
+  resultados: '<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
+  ayuda: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/>',
+  wa: '<path d="M20 12a8 8 0 0 1-11.7 7.1L4 20l1-4.1A8 8 0 1 1 20 12z"/><path d="M9 10c.5 2 2 3.5 4 4l1.2-1.1 1.8.8"/>',
+  ojo: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+  check: '<path d="M5 12l5 5 9-10"/>',
+  flecha: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  enviar: '<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',
+  alerta: '<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/>',
+};
+const VISTAS = {
+  inicio:     { titulo: 'Inicio',      ico: I.inicio },
+  aulas:      { titulo: 'Aulas',       ico: I.aulas,      desc: 'Estado de cada aula al cierre del turno y qué hacer.' },
+  reportes:   { titulo: 'Reportes QR', ico: I.reportes,   desc: 'Lo que reportan docentes y estudiantes desde el rótulo.' },
+  equipos:    { titulo: 'Equipos',     ico: I.equipos,    desc: 'Ficha de cada aire y prioridad de revisión o reemplazo.' },
+  resultados: { titulo: 'Resultados',  ico: I.resultados, desc: 'Comparación ronda 1 vs. ronda 2 del piloto.' },
+  ayuda:      { titulo: 'Ayuda',       ico: I.ayuda,      desc: 'Cómo usar el panel y cómo se calculan los datos.' },
+};
+
+/* =========================================================
+   B. UTILIDADES
+   ========================================================= */
+const estado = { rondas: [], reportes: [], fichas: {}, demo: true, actualizado: null, error: null, filtro: 'todos', usuario: null };
+const $ = s => document.querySelector(s);
+const reducir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const esSi = v => norm(v) === 'si';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const num = v => { let t = String(v || '').trim(); if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) t = t.replace(/\./g, ''); const n = parseFloat(t.replace(',', '.')); return isNaN(n) ? null : n; };
+const ico = (p, t = 18, w = 2.2) => `<svg width="${t}" height="${t}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+function aMinutos(s) {
+  const m = String(s || '').match(/(\d{1,2}):(\d{2})(?::\d{2})?\s*([ap])?/i); if (!m) return null;
+  let h = +m[1]; const mi = +m[2], ap = (m[3] || '').toLowerCase();
+  if (ap === 'p' && h < 12) h += 12; if (ap === 'a' && h === 12) h = 0; return h * 60 + mi;
+}
+const hora = min => { if (min == null) return '—'; const h = Math.floor(min / 60) % 24, m = min % 60; return `${((h + 11) % 12) + 1}:${String(m).padStart(2, '0')} ${h < 12 ? 'a. m.' : 'p. m.'}`; };
+function aFecha(s) {
+  const m = String(s || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s*(.*)/);
+  if (!m) { const d = new Date(s); return isNaN(d) ? null : d; }
+  const mins = aMinutos(m[4]) || 0; return new Date(+m[3], +m[2] - 1, +m[1], Math.floor(mins / 60), mins % 60);
+}
+const fechaCorta = d => d ? d.toLocaleDateString('es-NI', { weekday: 'short', day: 'numeric', month: 'short' }) : '—';
+function haceCuanto(d) {
+  if (!d) return ''; const min = Math.round((Date.now() - d) / 60000);
+  if (min < 1) return 'hace un momento'; if (min < 60) return `hace ${min} min`;
+  const h = Math.round(min / 60); if (h < 24) return `hace ${h} h`; const dd = Math.round(h / 24); return `hace ${dd} día${dd > 1 ? 's' : ''}`;
+}
+const pct = v => v == null ? '—' : `${Math.round(v * 100)} %`;
+const guardar = (k, v) => { try { localStorage.setItem('aj-' + k, v); } catch (e) {} };
+const leer = k => { try { return localStorage.getItem('aj-' + k); } catch (e) { return null; } };
+
+/* =========================================================
+   C. LEER CSV DE GOOGLE SHEETS
+   ========================================================= */
+function leerCSV(texto) {
+  const filas = []; let fila = [], campo = '', q = false;
+  for (let i = 0; i < texto.length; i++) {
+    const c = texto[i];
+    if (q) { if (c === '"') { if (texto[i + 1] === '"') { campo += '"'; i++; } else q = false; } else campo += c; }
+    else if (c === '"') q = true; else if (c === ',') { fila.push(campo); campo = ''; }
+    else if (c === '\n') { fila.push(campo); filas.push(fila); fila = []; campo = ''; } else if (c !== '\r') campo += c;
+  }
+  if (campo !== '' || fila.length) { fila.push(campo); filas.push(fila); }
+  const [enc, ...datos] = filas; if (!enc) return [];
+  const k = enc.map(norm);
+  return datos.filter(f => f.some(x => x.trim())).map(f => { const o = {}; k.forEach((c, i) => o[c] = (f[i] || '').trim()); return o; });
+}
+const col = (f, titulo) => f[norm(titulo)];
+const aRonda = f => ({
+  fecha: aFecha(col(f, 'Marca temporal')), aula: col(f, 'Aula'), ronda: String(col(f, 'Ronda') || '').trim().charAt(0),
+  fin: aMinutos(col(f, 'Hora de fin de la última clase')), rev: aMinutos(col(f, 'Hora de la revisión')),
+  vacia: norm(col(f, '¿Hay personas en el salón?')) === 'no', encendido: esSi(col(f, '¿El aire está encendido?')),
+  gotea: esSi(col(f, '¿Gotea?')), enfriamiento: col(f, 'Enfriamiento') || '', otra: col(f, 'Otra falla u observación') || '',
+  avisado: esSi(col(f, '¿Se avisó al encargado?')), apagado: aMinutos(col(f, 'Hora en que quedó apagado')),
+});
+const aReporte = f => ({
+  fecha: aFecha(col(f, 'Marca temporal')), aula: col(f, 'Aula'),
+  fallas: String(col(f, '¿Qué pasa con el aire?') || '').split(',').map(s => s.trim()).filter(Boolean),
+  comentario: col(f, 'Comentario') || '',
+});
+function aFichas(filas) {
+  const o = {};
+  filas.forEach(f => { const a = col(f, 'Aula'); if (!a) return;
+    o[a] = { marca: col(f, 'Marca'), modelo: col(f, 'Modelo'), btu: num(col(f, 'BTU')), inverter: col(f, '¿Inverter?'),
+      potencia: num(col(f, 'Potencia (kW)')), refrigerante: col(f, 'Refrigerante'), antiguedad: col(f, 'Antigüedad aprox.'), clasificacion: col(f, 'Clasificación'), fuente: col(f, 'Fuente del dato') }; });
+  return o;
+}
+
+/* =========================================================
+   D. DATOS DE DEMOSTRACIÓN (no son resultados reales)
+   ========================================================= */
+// Datos SIMULADOS del piloto (9–20 nov 2026): los mismos del informe y de la hoja de cálculo.
+const SIM = {"R":[{"f":"2026-11-09T18:14","a":"B-102","r":"1","fin":1070,"rev":1092,"v":true,"e":true,"g":true,"en":"Bueno","o":"","av":false,"ap":1188},{"f":"2026-11-09T18:46","a":"B-303","r":"1","fin":1100,"rev":1124,"v":true,"e":true,"g":false,"en":"Deficiente","o":"","av":false,"ap":1205},{"f":"2026-11-09T19:29","a":"O-201","r":"1","fin":1150,"rev":1167,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-10T18:10","a":"B-102","r":"1","fin":1070,"rev":1088,"v":true,"e":true,"g":false,"en":"Bueno","o":"","av":false,"ap":1162},{"f":"2026-11-10T18:41","a":"B-303","r":"1","fin":1100,"rev":1119,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-10T19:32","a":"O-201","r":"1","fin":1150,"rev":1170,"v":true,"e":true,"g":false,"en":"Bueno","o":"","av":false,"ap":1228},{"f":"2026-11-11T18:17","a":"B-102","r":"1","fin":1070,"rev":1095,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-11T18:48","a":"B-303","r":"1","fin":1100,"rev":1126,"v":true,"e":true,"g":false,"en":"Deficiente","o":"Hace ruido al arrancar","av":false,"ap":1235},{"f":"2026-11-11T19:30","a":"O-201","r":"1","fin":1150,"rev":1168,"v":false,"e":false,"g":false,"en":"","o":"","av":false,"ap":null},{"f":"2026-11-12T18:12","a":"B-102","r":"1","fin":1070,"rev":1090,"v":true,"e":true,"g":true,"en":"Bueno","o":"","av":false,"ap":1208},{"f":"2026-11-12T18:43","a":"B-303","r":"1","fin":1100,"rev":1121,"v":true,"e":true,"g":false,"en":"Bueno","o":"","av":false,"ap":1187},{"f":"2026-11-12T19:36","a":"O-201","r":"1","fin":1150,"rev":1174,"v":true,"e":true,"g":false,"en":"Bueno","o":"","av":false,"ap":1251},{"f":"2026-11-13T18:19","a":"B-102","r":"1","fin":1070,"rev":1097,"v":true,"e":true,"g":false,"en":"Bueno","o":"","av":false,"ap":1180},{"f":"2026-11-13T18:45","a":"B-303","r":"1","fin":1100,"rev":1123,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-13T19:31","a":"O-201","r":"1","fin":1150,"rev":1169,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-16T18:11","a":"B-102","r":"2","fin":1070,"rev":1089,"v":true,"e":true,"g":true,"en":"Bueno","o":"","av":true,"ap":1103},{"f":"2026-11-16T18:42","a":"B-303","r":"2","fin":1100,"rev":1120,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-16T19:33","a":"O-201","r":"2","fin":1150,"rev":1171,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-17T18:14","a":"B-102","r":"2","fin":1070,"rev":1092,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-17T18:45","a":"B-303","r":"2","fin":1100,"rev":1123,"v":true,"e":true,"g":false,"en":"Deficiente","o":"","av":true,"ap":1141},{"f":"2026-11-17T19:30","a":"O-201","r":"2","fin":1150,"rev":1168,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-18T18:16","a":"B-102","r":"2","fin":1070,"rev":1094,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-18T18:44","a":"B-303","r":"2","fin":1100,"rev":1122,"v":false,"e":false,"g":false,"en":"","o":"","av":false,"ap":null},{"f":"2026-11-18T19:32","a":"O-201","r":"2","fin":1150,"rev":1170,"v":true,"e":true,"g":false,"en":"Bueno","o":"","av":true,"ap":1178},{"f":"2026-11-19T18:13","a":"B-102","r":"2","fin":1070,"rev":1091,"v":true,"e":true,"g":true,"en":"Bueno","o":"","av":true,"ap":1100},{"f":"2026-11-19T18:47","a":"B-303","r":"2","fin":1100,"rev":1125,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-19T19:35","a":"O-201","r":"2","fin":1150,"rev":1173,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null},{"f":"2026-11-20T18:10","a":"B-102","r":"2","fin":1070,"rev":1088,"v":true,"e":true,"g":true,"en":"Bueno","o":"Aviso enviado, sin confirmación de apagado","av":true,"ap":null},{"f":"2026-11-20T18:41","a":"B-303","r":"2","fin":1100,"rev":1119,"v":true,"e":true,"g":false,"en":"Deficiente","o":"","av":true,"ap":1130},{"f":"2026-11-20T19:29","a":"O-201","r":"2","fin":1150,"rev":1167,"v":true,"e":false,"g":false,"en":"No aplica (aire apagado)","o":"","av":false,"ap":null}],"Q":[{"f":"2026-11-16T18:05","a":"B-102","x":["Gotea"],"c":"Cae agua al lado de la puerta"},{"f":"2026-11-16T18:41","a":"B-303","x":["No enfría"],"c":"Está en 24 y sigue haciendo calor"},{"f":"2026-11-17T19:02","a":"B-303","x":["Está encendido y no hay nadie"],"c":""},{"f":"2026-11-18T14:20","a":"B-102","x":["Gotea","Hace mucho ruido"],"c":"Suena como si vibrara"},{"f":"2026-11-18T18:47","a":"B-303","x":["No enfría"],"c":""},{"f":"2026-11-19T18:12","a":"B-102","x":["Está encendido y no hay nadie"],"c":"Ya terminó la clase"},{"f":"2026-11-20T18:55","a":"B-303","x":["Está encendido y no hay nadie"],"c":""},{"f":"2026-11-20T19:30","a":"O-201","x":["Otro"],"c":"El control no tiene pilas"}],"FI":{"B-102":{"marca":"York","modelo":"Placa no legible","btu":null,"inverter":"No indica","potencia":3.6,"refrigerante":"Por confirmar","antiguedad":"Antiguo (sin fecha visible)","clasificacion":"Antiguo","fuente":"Foto real del equipo; placa no legible. Potencia estimada (≈ 36,000 BTU ÷ EER 10)."},"B-303":{"marca":"Tempblue","modelo":"TBF42B-036-MYL2C","btu":36000,"inverter":"No indica","potencia":3.6,"refrigerante":"R-410A","antiguedad":"14 años (fabricado el 25/06/2012)","clasificacion":"Antiguo","fuente":"Placa real de la unidad interior. Potencia estimada (36,000 BTU ÷ EER 10)."},"O-201":{"marca":"Carrier","modelo":"Placa no visible","btu":null,"inverter":"Por confirmar","potencia":2.4,"refrigerante":"Por confirmar","antiguedad":"Reciente","clasificacion":"Nuevo","fuente":"Foto real del equipo; placa no visible. Potencia estimada (≈ 36,000 BTU ÷ EER 15)."}}};
+function datosDemo() {
+  return {
+    rondas: SIM.R.map(x => ({ fecha: new Date(x.f), aula: x.a, ronda: x.r, fin: x.fin, rev: x.rev, vacia: x.v, encendido: x.e,
+      gotea: x.g, enfriamiento: x.en, otra: x.o, avisado: x.av, apagado: x.ap })),
+    reportes: SIM.Q.map(q => ({ fecha: new Date(q.f), aula: q.a, fallas: q.x, comentario: q.c })),
+    fichas: SIM.FI,
+  };
+}
+
+/* =========================================================
+   E. CARGAR DATOS
+   ========================================================= */
+async function traer(url) {
+  const r = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });
+  if (!r.ok) throw new Error(`No se pudo leer la hoja (${r.status})`); return leerCSV(await r.text());
+}
+async function cargar() {
+  const b = $('#btnActualizar'); b.classList.add('girando');
+  try {
+    if (!CONFIG.URL_RONDAS) Object.assign(estado, datosDemo(), { demo: true });
+    else {
+      const [r, q, f] = await Promise.all([traer(CONFIG.URL_RONDAS), CONFIG.URL_REPORTES ? traer(CONFIG.URL_REPORTES) : [], CONFIG.URL_FICHAS ? traer(CONFIG.URL_FICHAS) : []]);
+      estado.rondas = r.map(aRonda).filter(x => x.aula); estado.reportes = q.map(aReporte).filter(x => x.aula);
+      estado.fichas = aFichas(f); estado.demo = false;
+    }
+    estado.error = null; estado.actualizado = new Date();
+  } catch (e) { estado.error = e.message || 'Error al cargar los datos'; }
+  b.classList.remove('girando');
+  pintarEstado(); mostrarVista();
+}
+
+/* =========================================================
+   F. "ATENDIDO" (en el prototipo se guarda solo en este navegador)
+   ========================================================= */
+const atendidos = new Set(JSON.parse(leer('atendidos') || '[]'));
+const idReporte = q => `rep-${q.aula}-${q.fecha ? q.fecha.getTime() : ''}`;
+const idRevision = x => `rev-${x.aula}-${x.fecha ? x.fecha.getTime() : ''}`;
+function marcar(id, msj) { atendidos.add(id); guardar('atendidos', JSON.stringify([...atendidos])); toast(msj); mostrarVista(); }
+/* Avisos enviados por WhatsApp: siguen pendientes hasta que el encargado o soporte los marquen en el panel */
+const envios = JSON.parse(leer('envios') || '{}');
+const envio = k => envios[k];
+function registrarEnvio(k) { const e = envios[k] || { n: 0 }; e.n++; e.t = Date.now(); envios[k] = e; guardar('envios', JSON.stringify(envios)); }
+const horaEnvio = e => new Date(e.t).toLocaleTimeString('es-NI', { hour: 'numeric', minute: '2-digit' });
+const textoEnvio = e => `Avisado ${e.n === 1 ? '1 vez' : e.n + ' veces'} (último a las ${horaEnvio(e)})`;
+const recordatorio = (e, t) => e ? `Recordatorio, aviso ${e.n + 1}: ${t}` : t;
+const RELOJ = '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>';
+
+/* =========================================================
+   G. CÁLCULOS
+   ========================================================= */
+const u = () => estado.usuario;
+function aulasDelUsuario() {
+  let a = CONFIG.AULAS;
+  if (u().rol === 'encargado') a = a.filter(x => x.edificio === u().edificio);
+  else if (estado.filtro !== 'todos') a = a.filter(x => x.edificio === estado.filtro);
+  return a;
+}
+const codigos = () => aulasDelUsuario().map(a => a.codigo);
+const edificioDe = aula => (CONFIG.AULAS.find(a => a.codigo === aula) || {}).edificio;
+function indicador(cods, ronda) {
+  const base = estado.rondas.filter(x => cods.includes(x.aula) && x.ronda === ronda && x.vacia);
+  const enc = base.filter(x => x.encendido).length;
+  return { valor: base.length ? enc / base.length : null, total: base.length, encendidas: enc };
+}
+function minutosSinUso(x) { if (!x.vacia || !x.encendido || x.fin == null) return 0; const h = x.apagado ?? x.rev; if (h == null) return 0; return Math.max(0, h - x.fin); }
+function energia(cods, ronda) { let kwh = 0, min = 0; estado.rondas.filter(x => cods.includes(x.aula) && (!ronda || x.ronda === ronda)).forEach(x => { const m = minutosSinUso(x); min += m; kwh += m / 60 * (estado.fichas[x.aula]?.potencia || 0); }); return { kwh, min, costo: kwh * CONFIG.TARIFA_KWH }; }
+function respuesta(cods) {
+  const t = estado.rondas.filter(x => cods.includes(x.aula) && x.ronda === '2' && x.avisado && x.apagado != null && x.rev != null).map(x => x.apagado - x.rev).filter(m => m >= 0);
+  return { prom: t.length ? t.reduce((a, b) => a + b, 0) / t.length : null, n: t.length };
+}
+const ultimaRevision = aula => estado.rondas.filter(x => x.aula === aula && x.vacia).sort((a, b) => (b.fecha || 0) - (a.fecha || 0))[0] || null;
+const encendidoPendiente = x => x && x.encendido && x.apagado == null && !atendidos.has(idRevision(x));
+const reparado = x => x && atendidos.has('fix-' + idRevision(x));
+const tieneFalla = x => x && !reparado(x) && (x.gotea || norm(x.enfriamiento) === 'deficiente' || !!x.otra);
+function puntaje(x) { if (!x) return null; return (encendidoPendiente(x) ? 1 : 0) + (tieneFalla(x) ? (x.gotea ? 1 : 0) + ((norm(x.enfriamiento) === 'deficiente' || x.otra) ? 1 : 0) : 0); }
+const ESTADOS = {
+  ok: { c: 'ok', p: 'p-ok', t: 'En orden', i: I.check },
+  warn: { c: 'warn', p: 'p-warn', t: 'Atención', i: '<path d="M12 7v6M12 17h.01"/>' },
+  bad: { c: 'bad', p: 'p-bad', t: 'Revisar', i: '<path d="M7 7l10 10M17 7 7 17"/>' },
+  none: { c: 'none', p: 'p-none', t: 'Sin revisiones', i: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>' },
+};
+const estadoDe = p => p == null ? ESTADOS.none : p === 0 ? ESTADOS.ok : p === 1 ? ESTADOS.warn : ESTADOS.bad;
+const esEncendidoQR = q => q.fallas.some(f => norm(f).includes('nohaynadie'));
+const reportesVisibles = () => estado.reportes.filter(q => codigos().includes(q.aula)).sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
+const pendientes = () => reportesVisibles().filter(q => !atendidos.has(idReporte(q)) && (u().rol === 'coordinacion' || (u().rol === 'soporte' ? !esEncendidoQR(q) : esEncendidoQR(q))));
+function prioridad(aula) {
+  const ref = Math.max(Date.now() * !estado.demo, ...estado.reportes.map(q => +q.fecha || 0), ...estado.rondas.map(x => +x.fecha || 0));
+  const f = estado.fichas[aula] || {}, hace30 = ref - 30 * 864e5;
+  const fallasQR = estado.reportes.filter(q => q.aula === aula && q.fecha > hace30 && !esEncendidoQR(q)).length;
+  const fallasRev = estado.rondas.filter(x => x.aula === aula && x.vacia && tieneFalla(x)).length;
+  const pts = (norm(f.clasificacion) === 'antiguo' ? 2 : 0) + (norm(f.refrigerante) === 'r22' ? 1 : 0) + (norm(f.inverter) === 'no' ? 1 : 0) + Math.min(fallasQR + fallasRev, 4);
+  return { pts, fallas: fallasQR + fallasRev, nivel: pts >= 5 ? 'Alta' : pts >= 3 ? 'Media' : 'Baja' };
+}
+
+/* =========================================================
+   H. WHATSAPP
+   ========================================================= */
+const wa = (n, t) => `https://wa.me/${n || ''}?text=${encodeURIComponent(t)}`;
+const numEncargado = aula => edificioDe(aula) === 'O' ? CONFIG.WHATSAPP.encargadoO : CONFIG.WHATSAPP.encargadoB;
+const lugarDe = aula => { const a = CONFIG.AULAS.find(z => z.codigo === aula); return a ? ` (Edificio ${a.edificio}, piso ${a.piso})` : ''; };
+const msjEncargado = (aula, x) => `Aire Justo UAM · ${aula}${lugarDe(aula)}: el aire está encendido y el aula está vacía${x ? ` (revisión de las ${hora(x.rev)})` : ''}. ¿Nos ayudás a apagarlo? ¡Gracias!`;
+function msjSoporte(aula, x, q) {
+  const p = q ? q.fallas.filter(f => !norm(f).includes('nohaynadie')) : [x?.gotea && 'gotea', norm(x?.enfriamiento) === 'deficiente' && 'enfría mal', x?.otra].filter(Boolean);
+  return `Aire Justo UAM · ${aula}${lugarDe(aula)}: el aire presenta ${p.length ? p.join(', ').toLowerCase() : 'una falla'}${q?.comentario ? ` («${q.comentario}»)` : ''}. Recomendamos revisar drenaje y filtro. Enviado desde el panel por ${u().nombre}.`;
+}
+
+/* =========================================================
+   I. INICIO DE SESIÓN
+   ========================================================= */
+function pintarCuentas() {
+  $('#cuentasDemo').innerHTML = CONFIG.USUARIOS.map(c => `
+    <button class="cuenta" type="button" data-u="${c.usuario}">
+      <span class="ca" aria-hidden="true">${c.rol === 'encargado' ? c.edificio : c.rol === 'soporte' ? 'ST' : 'RA'}</span>
+      <span><strong>${esc(c.nombre)}</strong><small>Usuario: ${c.usuario} · Contraseña: ${c.clave}</small></span>
+    </button>`).join('');
+}
+$('#cuentasDemo').addEventListener('click', e => {
+  const b = e.target.closest('.cuenta'); if (!b) return;
+  const c = CONFIG.USUARIOS.find(x => x.usuario === b.dataset.u);
+  $('#usuario').value = c.usuario; $('#clave').value = c.clave; $('#clave').focus();
+});
+$('#verClave').addEventListener('click', e => {
+  const ver = $('#clave').type === 'password'; $('#clave').type = ver ? 'text' : 'password';
+  e.currentTarget.setAttribute('aria-pressed', ver); e.currentTarget.setAttribute('aria-label', ver ? 'Ocultar contraseña' : 'Mostrar contraseña');
+});
+$('#formLogin').addEventListener('submit', e => {
+  e.preventDefault();
+  const us = $('#usuario').value.trim().toLowerCase(), cl = $('#clave').value;
+  const err = $('#errorLogin');
+  if (!us || !cl) { err.textContent = 'Escribe tu usuario y tu contraseña.'; err.hidden = false; return; }
+  const c = CONFIG.USUARIOS.find(x => x.usuario === us && x.clave === cl);
+  if (!c) {
+    err.textContent = 'Usuario o contraseña incorrectos.'; err.hidden = false;
+    const f = $('#formLogin'); f.classList.remove('agitar'); void f.offsetWidth; f.classList.add('agitar'); return;
+  }
+  err.hidden = true;
+  try { sessionStorage.setItem('aj-sesion', c.usuario); } catch (e) {}
+  entrar(c);
+});
+function entrar(c) {
+  estado.usuario = c; estado.filtro = 'todos';
+  $('#pantallaLogin').hidden = true; $('#app').hidden = false;
+  $('#avatar').textContent = c.nombre.split(' ').filter(p => p.length > 2).map(p => p[0].toUpperCase()).slice(0, 2).join('');
+  $('#uNombre').textContent = c.nombre; $('#uRol').textContent = ROLES[c.rol].nombre;
+  pintarNav();
+  if (!location.hash || !ROLES[c.rol].vistas.includes(location.hash.slice(1))) location.hash = '#inicio'; else mostrarVista();
+  cargar(); toast(`Bienvenido, ${c.nombre}`);
+}
+$('#btnSalir').addEventListener('click', () => {
+  try { sessionStorage.removeItem('aj-sesion'); } catch (e) {}
+  estado.usuario = null; $('#app').hidden = true; $('#pantallaLogin').hidden = false;
+  $('#formLogin').reset(); history.replaceState(null, '', location.pathname); $('#usuario').focus();
+});
+
+/* =========================================================
+   J. NAVEGACIÓN ENTRE SECCIONES
+   ========================================================= */
+function pintarNav() {
+  const v = ROLES[u().rol].vistas;
+  const link = (k, cls) => `<a href="#${k}" data-v="${k}">${ico(VISTAS[k].ico, cls ? 22 : 18)}<span>${VISTAS[k].titulo}</span></a>`;
+  $('#nav').innerHTML = v.map(k => link(k)).join('');
+  $('#tabbar').innerHTML = v.filter(k => k !== 'ayuda').map(k => link(k, true)).join('');
+}
+window.addEventListener('hashchange', () => { if (estado.usuario) { mostrarVista(); $('#principal').focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: reducir ? 'auto' : 'smooth' }); } });
+function mostrarVista() {
+  if (!estado.usuario) return;
+  let v = location.hash.slice(1) || 'inicio';
+  if (!ROLES[u().rol].vistas.includes(v)) v = 'inicio';
+  document.querySelectorAll('[data-v]').forEach(a => a.dataset.v === v ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
+  document.title = `${VISTAS[v].titulo} · Aire Justo UAM`;
+  pintarAvisos();
+  $('#vista').innerHTML = ({ inicio: vInicio, aulas: vAulas, reportes: vReportes, equipos: vEquipos, resultados: vResultados, ayuda: vAyuda })[v]();
+  if (v === 'resultados') animarBarras();
+  document.querySelectorAll('[data-contar]').forEach(el => contar(el));
+}
+const cabecera = (v, extra = '') => `
+  <div class="vista-head"><div>
+    <div class="miga"><a href="#inicio">Inicio</a> ${ico('<path d="M9 6l6 6-6 6"/>', 14)} <span>${VISTAS[v].titulo}</span></div>
+    <h1>${VISTAS[v].titulo}</h1><p>${VISTAS[v].desc}</p></div>${extra}</div>`;
+const filtrosEdificio = () => u().rol === 'encargado' ? `<span class="chip neutro" style="font-size:.85rem;padding:7px 14px">Edificio ${u().edificio}</span>` : `
+  <div class="filtros" role="group" aria-label="Filtrar por edificio">
+    ${[['todos', 'Todos'], ['B', 'Edificio B'], ['O', 'Edificio O']].map(([k, t]) => `<button class="filtro" type="button" data-ed="${k}" aria-pressed="${estado.filtro === k}">${t}</button>`).join('')}
+  </div>`;
+
+/* =========================================================
+   K. VISTA: INICIO
+   ========================================================= */
+function vInicio() {
+  const c = codigos(), rol = u().rol;
+  const est = c.map(a => estadoDe(puntaje(ultimaRevision(a))));
+  const rojas = est.filter(e => e.c === 'bad').length, amarillas = est.filter(e => e.c === 'warn').length;
+  const encendidas = c.filter(a => encendidoPendiente(ultimaRevision(a))).length;
+  const pend = pendientes().length;
+  let tarjetas;
+  if (rol === 'encargado') tarjetas = [
+    { t: 'Aires encendidos sin nadie', v: encendidas, s: encendidas ? 'Ve a apagarlos' : 'Todo apagado', k: encendidas ? 'k-bad' : '' },
+    { t: 'Aulas por revisar', v: rojas + amarillas, s: `${rojas} en rojo · ${amarillas} en amarillo`, k: rojas ? 'k-bad' : amarillas ? 'k-warn' : '' },
+    { t: 'Reportes QR pendientes', v: pend, s: 'De tu edificio', k: pend ? 'k-warn' : '' },
+  ];
+  else if (rol === 'soporte') {
+    const conFalla = c.filter(a => tieneFalla(ultimaRevision(a))).length, altas = c.filter(a => prioridad(a).nivel === 'Alta').length;
+    tarjetas = [
+      { t: 'Equipos con falla', v: conFalla, s: 'Según la última revisión', k: conFalla ? 'k-bad' : '' },
+      { t: 'Prioridad alta', v: altas, s: 'Revisar o proponer reemplazo', k: altas ? 'k-warn' : '' },
+      { t: 'Reportes de falla pendientes', v: pend, s: 'Llegados por QR', k: pend ? 'k-warn' : '' },
+    ];
+  } else {
+    const r1 = indicador(c, '1'), r2 = indicador(c, '2');
+    tarjetas = [
+      { t: 'Aulas por revisar', v: rojas + amarillas, s: `${rojas} en rojo · ${amarillas} en amarillo`, k: rojas ? 'k-bad' : '' },
+      { t: 'Reportes QR pendientes', v: pend, s: 'Hasta que el encargado o soporte los marquen', k: pend ? 'k-warn' : '' },
+      { t: 'Aires olvidados R1 → R2', v: null, txt: `${pct(r1.valor)} → ${pct(r2.valor)}`, s: 'Indicador principal del piloto' },
+    ];
+  }
+  const desc = { aulas: rol === 'encargado' ? 'Qué aula ir a apagar o revisar.' : 'Estado de cada aula al cierre.', reportes: 'Avisos que llegan desde el QR.', equipos: 'Ficha y prioridad de cada aire.', resultados: 'Ronda 1 vs. ronda 2 del piloto.', ayuda: 'Cómo usar el panel.' };
+  const badge = { aulas: rol === 'encargado' ? encendidas : rojas + amarillas, reportes: pend };
+  const hola = new Date().getHours() < 12 ? 'Buenos días' : new Date().getHours() < 18 ? 'Buenas tardes' : 'Buenas noches';
+  const frase = rol === 'encargado' ? `Revisá las aulas del Edificio ${u().edificio} al cierre del turno. Si un aire quedó encendido sin nadie, apagalo y marcalo como apagado.`
+    : rol === 'soporte' ? 'Aquí ves qué aires fallan y cuáles conviene revisar o proponer para reemplazo primero.'
+    : 'Revisá los reportes del QR y las rondas de cierre, y reenviá cada aviso: al encargado si hay que apagar, a soporte si hay una falla.';
+  return `
+  <div class="saludo entrar">
+    <div><span class="rol">${ico(I.check, 14, 3)} ${ROLES[rol].nombre}${rol === 'encargado' ? ` · Edificio ${u().edificio}` : ''}</span>
+      <h1>${hola}, ${esc(u().nombre)}</h1><p>${frase}</p></div>
+  </div>
+  <h2 class="sr">Resumen</h2>
+  <div class="resumen">${tarjetas.map((t, i) => `
+    <article class="card kpi ${t.k || ''} entrar" style="animation-delay:${i * 70}ms">
+      <div class="etq">${t.t}</div>
+      <div class="valor" ${t.v != null ? `data-contar="${t.v}"` : ''}>${t.v != null ? t.v : t.txt}</div>
+      <div class="sub">${t.s}</div>
+    </article>`).join('')}
+  </div>
+  <h2 style="font-size:1.2rem;font-weight:800;margin-bottom:14px">¿Qué querés hacer?</h2>
+  <div class="tiles">${ROLES[rol].vistas.filter(k => k !== 'inicio').map((k, i) => `
+    <a class="card tile entrar" href="#${k}" style="animation-delay:${150 + i * 70}ms">
+      <span class="ti">${ico(VISTAS[k].ico, 26)}</span>
+      ${badge[k] ? `<span class="chip ${k === 'aulas' && rojas ? 'bad' : 'warn'} badge">${badge[k]} pendiente${badge[k] > 1 ? 's' : ''}</span>` : ''}
+      <div><h2>${VISTAS[k].titulo}</h2><p>${desc[k]}</p></div>
+      <span class="ir">Abrir ${ico(I.flecha, 16, 2.4)}</span>
+    </a>`).join('')}
+  </div>`;
+}
+
+/* =========================================================
+   L. VISTA: AULAS
+   ========================================================= */
+function vAulas() {
+  const rol = u().rol;
+  const tarjetas = aulasDelUsuario().map((a, i) => {
+    const x = ultimaRevision(a.codigo), st = estadoDe(puntaje(x)), f = estado.fichas[a.codigo];
+    const pend = encendidoPendiente(x), falla = tieneFalla(x);
+    const kEnc = x ? 'enc-' + idRevision(x) : '', kSop = x ? 'sop-' + idRevision(x) : '';
+    const eEnc = envio(kEnc), eSop = envio(kSop);
+    const ficha = f ? `<b>${esc(f.clasificacion || 'Sin clasificar')}</b> · ${esSi(f.inverter) ? 'Inverter' : norm(f.inverter) === 'no' ? 'No inverter' : 'Inverter por confirmar'} · ${f.potencia ? '≈ ' + f.potencia + ' kW (est.)' : 'potencia ?'} · ${norm(f.refrigerante).startsWith('porconfirmar') || !f.refrigerante ? 'refrigerante por confirmar' : esc(f.refrigerante)}` : 'Ficha del aire pendiente';
+    const aire = !x ? '—' : !x.encendido ? 'Apagado' : x.apagado != null ? `Apagado ${hora(x.apagado)}` : atendidos.has(idRevision(x)) ? 'Marcado apagado' : 'Encendido sin nadie';
+    const q = [], linea = (c, i, t) => q.push(`<div class="que-hacer ${c}">${ico(i, 18)}${t}</div>`);
+    if (rol === 'encargado') {
+      if (pend) linea('bad', I.alerta, 'Ir a apagar el aire de esta aula.' + (eEnc ? ` Te avisaron por WhatsApp ${eEnc.n === 1 ? '1 vez' : eEnc.n + ' veces'}.` : ''));
+      if (falla) linea('warn', I.equipos, eSop ? 'Falla ya enviada a soporte. Esperando que la revise.' : 'Falla en el equipo: la reporta a soporte el responsable de avisos.');
+    } else if (rol === 'soporte') {
+      if (falla) linea('warn', I.equipos, 'Revisar el equipo (drenaje, filtro, gas).' + (eSop ? ` Te avisaron por WhatsApp ${eSop.n === 1 ? '1 vez' : eSop.n + ' veces'}.` : ''));
+      else if (pend) linea('ok', I.check, 'Aire encendido sin nadie: lo apaga el encargado. Sin fallas para soporte.');
+    } else {
+      if (pend) eEnc ? linea('espera', RELOJ, `${textoEnvio(eEnc)}. Sigue pendiente hasta que el encargado lo marque como apagado.`) : linea('bad', I.alerta, 'Aire encendido sin nadie: avisar al encargado.');
+      if (falla) eSop ? linea('espera', RELOJ, `Enviado a soporte. ${textoEnvio(eSop)}. Sigue pendiente hasta que soporte lo marque como reparado.`) : linea('warn', I.equipos, 'Falla en el equipo: reportar a soporte.');
+    }
+    if (!q.length && x && reparado(x)) linea('ok', I.check, 'Reparado por soporte. Se confirma en la próxima ronda.');
+    else if (!q.length && x) linea('ok', I.check, 'Nada pendiente en esta aula.');
+    const que = q.join('');
+    let btns = '';
+    if (pend && rol === 'encargado') btns += `<button class="btn btn-primary" type="button" data-apagar="${a.codigo}">${ico(I.check)}Marcar como apagado</button>`;
+    if (pend && rol === 'coordinacion') btns += `<a class="btn btn-wa" data-envio="${kEnc}" target="_blank" rel="noopener" href="${wa(numEncargado(a.codigo), recordatorio(eEnc, msjEncargado(a.codigo, x)))}" aria-label="${eEnc ? 'Volver a avisar' : 'Avisar'} al encargado de ${a.codigo} por WhatsApp">${ico(I.wa)}${eEnc ? 'Volver a avisar' : 'Avisar al encargado'}</a>`;
+    if (falla && rol === 'coordinacion') btns += `<a class="btn btn-wa" data-envio="${kSop}" target="_blank" rel="noopener" href="${wa(CONFIG.WHATSAPP.soporte, recordatorio(eSop, msjSoporte(a.codigo, x)))}" aria-label="${eSop ? 'Volver a avisar a' : 'Reportar a'} soporte la falla de ${a.codigo} por WhatsApp">${ico(I.wa)}${eSop ? 'Volver a avisar a soporte' : 'Reportar a soporte'}</a>`;
+    if (falla && rol === 'soporte') btns += `<button class="btn btn-primary" type="button" data-atender="fix-${idRevision(x)}" data-msj="${a.codigo} marcado como reparado">${ico(I.check)}Marcar como reparado</button>`;
+    btns += `<button class="btn btn-ghost" type="button" data-detalle="${a.codigo}">${ico(I.ojo)}Ver detalle</button>`;
+    return `
+    <article class="card aula s-${st.c} entrar" style="animation-delay:${i * 80}ms" aria-labelledby="h-${a.codigo}">
+      <div class="aula-top"><div><h2 id="h-${a.codigo}">${a.codigo}</h2><div class="lugar">Edificio ${a.edificio} · Piso ${a.piso}</div></div>
+        <span class="pill ${st.p}">${ico(st.i, 15, 2.8)}${st.t}</span></div>
+      <div class="ficha">${ficha}</div>
+      <div class="datos">
+        <div class="dato"><small>Última revisión</small><span>${x ? `${fechaCorta(x.fecha)} · ${hora(x.rev)}` : '—'}</span></div>
+        <div class="dato"><small>Aire</small><span>${aire}</span></div>
+        <div class="dato"><small>Goteo</small><span>${x ? (x.gotea ? 'Sí' : 'No') : '—'}</span></div>
+        <div class="dato"><small>Enfriamiento</small><span>${x ? esc(x.enfriamiento || '—') : '—'}</span></div>
+      </div>
+      ${que}
+      <div class="acciones">${btns}</div>
+    </article>`;
+  }).join('');
+  return cabecera('aulas') + `
+  <div class="barra-filtros">${filtrosEdificio()}
+    <div class="leyenda" aria-label="Significado de los colores">
+      <span><span class="pill p-ok">${ico(I.check, 13, 3)}En orden</span></span>
+      <span><span class="pill p-warn">! Atención</span> 1 problema</span>
+      <span><span class="pill p-bad">✕ Revisar</span> 2 o más</span>
+    </div></div>
+  <div class="aulas">${tarjetas || '<p class="vacio">No hay aulas para mostrar.</p>'}</div>`;
+}
+
+/* =========================================================
+   M. VISTA: REPORTES QR
+   ========================================================= */
+function vReportes() {
+  const rol = u().rol;
+  let lista = reportesVisibles();
+  if (rol === 'soporte') lista = lista.filter(q => !esEncendidoQR(q));
+  if (rol === 'encargado') lista = lista.filter(q => esEncendidoQR(q));
+  const pend = lista.filter(q => !atendidos.has(idReporte(q))), hechos = lista.filter(q => atendidos.has(idReporte(q)));
+  const fila = q => {
+    const enc = esEncendidoQR(q), at = atendidos.has(idReporte(q)), id = idReporte(q), ev = envio(id);
+    let btns = '', estadoEnvio = '';
+    if (!at) {
+      if (enc && rol === 'encargado') btns += `<button class="btn btn-primary btn-sm" type="button" data-atender="${id}" data-msj="Marcado como apagado">${ico(I.check, 16)}Ya lo apagué</button>`;
+      if (enc && rol === 'coordinacion') btns += `<a class="btn btn-wa btn-sm" data-envio="${id}" target="_blank" rel="noopener" href="${wa(numEncargado(q.aula), recordatorio(ev, `Aire Justo UAM · ${q.aula}${lugarDe(q.aula)}: reportan por QR que el aire está encendido y no hay nadie. ¿Nos ayudás a apagarlo? ¡Gracias!`))}">${ico(I.wa, 16)}${ev ? 'Volver a avisar' : 'Avisar encargado'}</a>`;
+      if (!enc && rol === 'coordinacion') btns += `<a class="btn btn-wa btn-sm" data-envio="${id}" target="_blank" rel="noopener" href="${wa(CONFIG.WHATSAPP.soporte, recordatorio(ev, msjSoporte(q.aula, null, q)))}">${ico(I.wa, 16)}${ev ? 'Volver a avisar' : 'Enviar a soporte'}</a>`;
+      if (!enc && rol === 'soporte') btns += `<button class="btn btn-primary btn-sm" type="button" data-atender="${id}" data-msj="Marcado como revisado">${ico(I.check, 16)}Revisado</button>`;
+      if (ev) estadoEnvio = `<div class="tags"><span class="chip espera">${ico(RELOJ, 13, 2.5)} ${textoEnvio(ev)} · esperando ${rol === 'coordinacion' ? (enc ? 'al encargado' : 'a soporte') : 'que lo marqués'}</span></div>`;
+    } else btns = `<span class="chip ok">${ico(I.check, 13, 3)} ${enc ? 'Apagado por el encargado' : 'Revisado por soporte'}</span>`;
+    return `
+    <div class="rep ${at ? 'atendido' : ''}">
+      <div class="av" aria-hidden="true">${esc(q.aula)}</div>
+      <div class="cuerpo">
+        <div><strong>${esc(q.aula)}</strong> <span class="cuando">· ${fechaCorta(q.fecha)} · ${haceCuanto(q.fecha)}</span></div>
+        <div class="tags">${q.fallas.map(f => `<span class="chip ${norm(f).includes('nohaynadie') || norm(f) === 'gotea' ? 'bad' : 'neutro'}">${esc(f)}</span>`).join('')}</div>
+        ${q.comentario ? `<div class="coment">“${esc(q.comentario)}”</div>` : ''}
+        ${estadoEnvio}
+      </div>
+      <div class="acc">${btns}</div>
+    </div>`;
+  };
+  return cabecera('reportes', rol !== 'encargado' ? filtrosEdificio() : `<span class="chip neutro" style="font-size:.85rem;padding:7px 14px">Edificio ${u().edificio}</span>`) + `
+  <h2 style="font-size:1.1rem;font-weight:800;margin:0 0 10px">Pendientes (${pend.length})</h2>
+  <div class="card lista entrar">${pend.length ? pend.map(fila).join('') : `<div class="vacio">${ico(I.check, 34)}<p>No hay reportes pendientes. ¡Todo al día!</p></div>`}</div>
+  ${hechos.length ? `<details style="margin-top:18px"><summary>Atendidos (${hechos.length})</summary><div class="lista">${hechos.map(fila).join('')}</div></details>` : ''}
+  <p class="lugar" style="margin-top:14px">${ico(I.alerta, 14)} En este prototipo, «atendido» se guarda solo en este navegador.</p>`;
+}
+
+/* =========================================================
+   N. VISTA: EQUIPOS
+   ========================================================= */
+function vEquipos() {
+  const filas = aulasDelUsuario().map(a => ({ a, f: estado.fichas[a.codigo] || {}, p: prioridad(a.codigo), x: ultimaRevision(a.codigo) })).sort((m, n) => n.p.pts - m.p.pts);
+  const chipP = n => `<span class="chip ${n === 'Alta' ? 'bad' : n === 'Media' ? 'warn' : 'ok'}">${n}</span>`;
+  return cabecera('equipos', filtrosEdificio()) + `
+  <div class="card entrar"><div class="tabla-wrap"><table>
+    <caption class="sr">Equipos ordenados por prioridad</caption>
+    <thead><tr><th scope="col">Aula</th><th scope="col">Prioridad</th><th scope="col">Clasificación</th><th scope="col">Inverter</th><th scope="col">Potencia (est.)</th><th scope="col">Refrigerante</th><th scope="col">Fallas registradas</th><th scope="col">Última revisión</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead>
+    <tbody>${filas.map(r => `<tr>
+      <th scope="row">${r.a.codigo}</th><td>${chipP(r.p.nivel)}</td><td>${esc(r.f.clasificacion || '—')}</td><td>${esc(r.f.inverter || '—')}</td>
+      <td>${r.f.potencia ? '≈ ' + r.f.potencia + ' kW' : '—'}</td><td>${esc(r.f.refrigerante || '—')}</td><td>${r.p.fallas}</td>
+      <td>${r.x ? `${fechaCorta(r.x.fecha)}${tieneFalla(r.x) ? ' · con falla' : ''}` : '—'}</td>
+      <td><button class="btn btn-ghost btn-sm" type="button" data-detalle="${r.a.codigo}">${ico(I.ojo, 16)}Detalle</button></td></tr>`).join('')}
+    </tbody></table></div></div>
+  <div class="dos">
+    <div class="card" style="padding:20px"><h2 style="font-size:1.05rem;font-weight:800;margin-bottom:8px">Cómo se calcula la prioridad</h2>
+      <p class="lugar" style="font-size:.92rem">Suma de puntos: equipo antiguo (+2), refrigerante R-22 (+1), no inverter confirmado (+1) y cada falla registrada en revisiones o reportes de los últimos 30 días (+1, máximo 4). Alta: 5 o más · Media: 3–4 · Baja: 0–2.</p></div>
+    <div class="card" style="padding:20px"><h2 style="font-size:1.05rem;font-weight:800;margin-bottom:8px">Refrigerantes</h2>
+      <p class="lugar" style="font-size:.92rem">El R-22 está en eliminación por el Protocolo de Montreal y el R-410A (en B-303) es un HFC de alto potencial de calentamiento, en reducción por la Enmienda de Kigali. Al retirar un equipo, un técnico debe recuperar el gas; nunca liberarlo. La potencia de los equipos es estimada.</p></div>
+  </div>`;
+}
+
+/* =========================================================
+   O. VISTA: RESULTADOS DEL PILOTO
+   ========================================================= */
+function vResultados() {
+  const c = codigos(), r1 = indicador(c, '1'), r2 = indicador(c, '2'), res = respuesta(c), e1 = energia(c, '1'), e2 = energia(c, '2');
+  const dif = r1.valor != null && r2.valor != null ? Math.round((r2.valor - r1.valor) * 100) : null;
+  const chip = dif == null ? '<span class="chip neutro">Falta la ronda 2</span>' : dif <= -CONFIG.META_PUNTOS ? `<span class="chip ok">▼ ${-dif} pts · meta cumplida</span>` : dif < 0 ? `<span class="chip warn">▼ ${-dif} pts · meta ${CONFIG.META_PUNTOS}</span>` : `<span class="chip bad">▲ ${dif} pts</span>`;
+  const filas = aulasDelUsuario().map(a => ({ n: a.codigo, r1: indicador([a.codigo], '1'), r2: indicador([a.codigo], '2') }));
+  filas.push({ n: 'Total', r1, r2 });
+  const barra = (k, d, e) => `<div class="barra ${k}"><div class="pista"><div class="relleno" data-w="${d.valor == null ? 0 : d.valor * 100}"></div></div><output aria-label="${e}: ${pct(d.valor)}">${pct(d.valor)}</output></div>`;
+  return cabecera('resultados', filtrosEdificio()) + `
+  <div class="resumen">
+    <article class="card kpi entrar"><div class="etq">Ronda 1 · sin avisos</div><div class="valor">${pct(r1.valor)}</div><div class="sub">${r1.encendidas} de ${r1.total} revisiones con aire encendido</div></article>
+    <article class="card kpi entrar" style="animation-delay:70ms"><div class="etq">Ronda 2 · con avisos</div><div class="valor">${pct(r2.valor)}</div><div class="sub">${chip}</div></article>
+    <article class="card kpi entrar" style="animation-delay:140ms"><div class="etq">Respuesta del encargado</div><div class="valor">${res.prom == null ? '—' : Math.round(res.prom) + ' min'}</div><div class="sub">${res.n ? `Promedio de ${res.n} aviso${res.n > 1 ? 's' : ''}` : 'Se mide en la ronda 2'}</div></article>
+    <article class="card kpi entrar" style="animation-delay:210ms"><div class="etq">Energía sin uso por semana (estimada)</div><div class="valor">${e1.kwh.toFixed(1)} → ${e2.kwh.toFixed(1)} kWh</div><div class="sub">≈ C$ ${e1.costo.toFixed(0)} → C$ ${e2.costo.toFixed(0)} · ronda 1 → ronda 2</div></article>
+  </div>
+  <div class="card grafico entrar">
+    <h2 style="font-size:1.1rem;font-weight:800;margin-bottom:4px">Revisiones con el aire encendido en el aula vacía</h2>
+    <p class="lugar" style="margin:0 0 14px">Menos es mejor. Meta: bajar al menos ${CONFIG.META_PUNTOS} puntos.</p>
+    <div class="g-leyenda" aria-hidden="true"><span><i style="background:var(--bar-1)"></i>Ronda 1 · sin avisos</span><span><i style="background:var(--bar-2)"></i>Ronda 2 · con avisos al encargado</span></div>
+    <div role="img" aria-label="Gráfico de barras por aula: ronda 1 contra ronda 2. Los mismos datos están en la tabla de abajo.">
+      ${filas.map(f => `<div class="g-fila"><div class="nom">${f.n}</div><div class="barras">${barra('r1', f.r1, 'Ronda 1')}${barra('r2', f.r2, 'Ronda 2')}</div></div>`).join('')}
+    </div>
+    <details style="margin-top:16px"><summary>Ver los datos como tabla</summary><div class="tabla-wrap"><table>
+      <thead><tr><th scope="col">Aula</th><th scope="col">Ronda 1</th><th scope="col">Revisiones R1</th><th scope="col">Ronda 2</th><th scope="col">Revisiones R2</th></tr></thead>
+      <tbody>${filas.map(f => `<tr><th scope="row">${f.n}</th><td>${pct(f.r1.valor)}</td><td>${f.r1.encendidas} de ${f.r1.total}</td><td>${pct(f.r2.valor)}</td><td>${f.r2.encendidas} de ${f.r2.total}</td></tr>`).join('')}</tbody>
+    </table></div></details>
+  </div>`;
+}
+function animarBarras() { requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll('.relleno').forEach(el => el.style.width = el.dataset.w + '%'))); }
+
+/* =========================================================
+   P. VISTA: AYUDA
+   ========================================================= */
+function vAyuda() {
+  const rol = u().rol;
+  const pasos = rol === 'encargado' ? ['Al cierre de cada turno, abrí <b>Aulas</b>.', 'Las aulas en rojo o amarillo con «Ir a apagar» tienen el aire encendido sin nadie: andá y apagalo.', 'Tocá <b>Marcar como apagado</b>.', 'Las fallas (goteo, no enfría) no te tocan: el responsable de avisos se las manda a soporte.', 'En <b>Reportes QR</b> ves los avisos de aires encendidos en tu edificio; al apagarlo tocá <b>Ya lo apagué</b>.']
+    : rol === 'soporte' ? ['Abrí <b>Equipos</b>: están ordenados por prioridad.', 'En <b>Reportes QR</b> ves las fallas que reportan docentes y estudiantes.', 'Al revisar un equipo, marcá el reporte como <b>Revisado</b>.', 'Usá la ficha de cada equipo para proponer reemplazos.']
+    : ['Hacé la ronda de cierre con el formulario de Google.', 'Si el aire está encendido sin nadie, usá <b>Avisar al encargado</b> en Aulas.', 'Reenviá los reportes QR al encargado o a soporte.', 'Cada aviso queda <b>esperando</b> hasta que el encargado lo marque como apagado o soporte como reparado. Si no lo marcan, usá <b>Volver a avisar</b>.', 'Revisá <b>Resultados</b> para comparar la ronda 1 con la ronda 2.'];
+  return cabecera('ayuda') + `
+  <div class="dos" style="margin-top:0">
+    <div class="card" style="padding:22px">
+      <h2 style="font-size:1.1rem;font-weight:800;margin-bottom:12px">Qué hacer como ${ROLES[rol].nombre.toLowerCase()}</h2>
+      <ol style="margin:0;padding-left:20px;display:grid;gap:10px">${pasos.map(p => `<li>${p}</li>`).join('')}</ol>
+    </div>
+    <div class="card" style="padding:22px">
+      <details open><summary>Colores de las aulas</summary><p>En la última revisión con el aula vacía se suma 1 punto por cada problema: aire encendido sin apagar, goteo, y enfriamiento deficiente u otra falla. 0 = En orden · 1 = Atención · 2 o más = Revisar.</p></details>
+      <details><summary>Indicador principal</summary><p><span class="formula">revisiones con aire encendido y aula vacía ÷ revisiones con aula vacía × 100</span></p><p>Ronda 1 = sin avisos (línea base). Ronda 2 = con rótulo QR y avisos al encargado.</p></details>
+      <details><summary>Energía y costo</summary><p>Son estimaciones: minutos con el aire encendido sin nadie × potencia de placa. No hay medidores por aula.</p></details>
+      <details><summary>Privacidad</summary><p>No se muestran nombres de docentes ni estudiantes; solo aulas y horas. Los avisos dicen aula y hora, nunca quién estaba de turno.</p></details>
+      <details><summary>Accesibilidad</summary><p>Con el botón de accesibilidad de arriba podés agrandar el texto, activar alto contraste o modo oscuro. Todo se puede usar con teclado.</p></details>
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   Q. DETALLE DE UN AULA
+   ========================================================= */
+let focoPrevio = null;
+function abrirDetalle(aula) {
+  focoPrevio = document.activeElement;
+  const f = estado.fichas[aula], filas = estado.rondas.filter(x => x.aula === aula).sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
+  $('#dTitulo').textContent = `Aula ${aula}`;
+  $('#dCuerpo').innerHTML = `
+    <h3 style="font-size:1rem;margin-bottom:8px">Ficha del aire</h3>
+    ${f ? `<div class="datos" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+      <div class="dato"><small>Marca / modelo</small><span>${esc(f.marca || '—')} ${esc(f.modelo || '')}</span></div>
+      <div class="dato"><small>Capacidad</small><span>${f.btu ? f.btu.toLocaleString('es-NI') + ' BTU' : 'Por confirmar'}</span></div>
+      <div class="dato"><small>Inverter</small><span>${esc(f.inverter || '—')}</span></div>
+      <div class="dato"><small>Potencia (estimada)</small><span>${f.potencia ? '≈ ' + f.potencia + ' kW' : '—'}</span></div>
+      <div class="dato"><small>Refrigerante</small><span>${esc(f.refrigerante || '—')}</span></div>
+      <div class="dato"><small>Antigüedad</small><span>${esc(f.antiguedad || '—')}</span></div></div>${f.fuente ? `<p class="lugar" style="margin:8px 0 0">Fuente: ${esc(f.fuente)}</p>` : ''}`
+    : '<p class="ficha">Ficha pendiente: llenarla en la pestaña «Fichas de aires».</p>'}
+    <h3 style="font-size:1rem;margin:20px 0 8px">Revisiones registradas (${filas.length})</h3>
+    <div class="tabla-wrap"><table>
+      <thead><tr><th scope="col">Fecha</th><th scope="col">Ronda</th><th scope="col">Aire</th><th scope="col">Goteo</th><th scope="col">Enfriamiento</th><th scope="col">Aviso → apagado</th></tr></thead>
+      <tbody>${filas.map(r => `<tr><td>${fechaCorta(r.fecha)} · ${hora(r.rev)}</td><td>${r.ronda}</td>
+        <td>${!r.vacia ? 'Aula con clase' : r.encendido ? 'Encendido' : 'Apagado'}</td><td>${r.vacia ? (r.gotea ? 'Sí' : 'No') : '—'}</td>
+        <td>${esc(r.enfriamiento || '—')}</td><td>${r.avisado ? (r.apagado != null ? `${r.apagado - r.rev} min` : 'Avisado') : '—'}</td></tr>`).join('') || '<tr><td colspan="6">Sin revisiones.</td></tr>'}
+      </tbody></table></div>`;
+  $('#detalle').showModal();
+}
+$('#dCerrar').addEventListener('click', () => $('#detalle').close());
+$('#detalle').addEventListener('click', e => { if (e.target.id === 'detalle') $('#detalle').close(); });
+$('#detalle').addEventListener('close', () => focoPrevio && focoPrevio.focus());
+
+/* =========================================================
+   R. EVENTOS GENERALES
+   ========================================================= */
+document.addEventListener('click', e => {
+  const d = e.target.closest('[data-detalle]'); if (d) return abrirDetalle(d.dataset.detalle);
+  const f = e.target.closest('.filtro'); if (f) { estado.filtro = f.dataset.ed; mostrarVista(); return toast(`Mostrando: ${f.textContent}`); }
+  const ap = e.target.closest('[data-apagar]');
+  if (ap) { const x = ultimaRevision(ap.dataset.apagar); if (x) marcar(idRevision(x), `${ap.dataset.apagar} marcado como apagado`); return; }
+  const at = e.target.closest('[data-atender]'); if (at) return marcar(at.dataset.atender, at.dataset.msj);
+  const ev = e.target.closest('[data-envio]');
+  if (ev) { registrarEnvio(ev.dataset.envio); setTimeout(() => { mostrarVista(); toast('Aviso enviado. Queda pendiente hasta que lo marquen en el panel.'); }, 0); }
+  if (!e.target.closest('#menuAcc') && !e.target.closest('#btnAcc')) cerrarMenu();
+});
+$('#btnActualizar').addEventListener('click', () => cargar().then(() => toast(estado.error ? 'No se pudo actualizar' : 'Datos actualizados')));
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest('.btn'); if (!b || reducir) return;
+  const r = b.getBoundingClientRect(), s = Math.max(r.width, r.height), o = document.createElement('span');
+  o.className = 'ripple'; o.style.width = o.style.height = s + 'px'; o.style.left = (e.clientX - r.left - s / 2) + 'px'; o.style.top = (e.clientY - r.top - s / 2) + 'px';
+  b.appendChild(o); setTimeout(() => o.remove(), 600);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarMenu(); });
+let tT; function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('ver'); clearTimeout(tT); tT = setTimeout(() => el.classList.remove('ver'), 2300); }
+function contar(el) {
+  const fin = +el.dataset.contar; if (reducir || !fin) { el.textContent = fin; return; }
+  const t0 = performance.now(); const paso = t => { const k = Math.min(1, (t - t0) / 700); el.textContent = Math.round(fin * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(paso); };
+  requestAnimationFrame(paso);
+}
+function pintarEstado() {
+  $('#dot').classList.toggle('demo', estado.demo);
+  $('#estadoTxt').textContent = estado.error ? 'No se pudieron actualizar los datos' : estado.demo ? 'Datos simulados' : `Actualizado ${estado.actualizado.toLocaleTimeString('es-NI', { hour: 'numeric', minute: '2-digit' })}`;
+}
+function pintarAvisos() {
+  let h = '';
+  if (estado.demo) h += `<div class="aviso demo" role="note">${ico(I.alerta, 22)}<div><strong>Datos simulados del piloto (9 al 20 de noviembre de 2026).</strong>No son mediciones reales: muestran cómo funcionaría el sistema. Para usar datos reales, se pegan los enlaces CSV de la hoja en la configuración del código.</div></div>`;
+  if (estado.error) h += `<div class="aviso error" role="alert">${ico(I.alerta, 22)}<div><strong>No se pudieron cargar los datos.</strong>${esc(estado.error)}. Revisá la conexión o que la hoja siga publicada.</div></div>`;
+  $('#avisos').innerHTML = h;
+}
+
+/* =========================================================
+   S. ACCESIBILIDAD (texto, contraste, modo oscuro)
+   ========================================================= */
+const TAM = [['100%', 'Normal'], ['112.5%', 'Grande'], ['125%', 'Muy grande']];
+let iTam = +(leer('tam') || 0);
+if (leer('tema') == null && matchMedia('(prefers-color-scheme: dark)').matches) guardar('tema', 'dark');
+function aplicarPrefs() {
+  const html = document.documentElement, alto = leer('contraste') === 'alto', osc = leer('tema') === 'dark';
+  html.style.fontSize = TAM[iTam][0]; $('#tTextoTxt').textContent = TAM[iTam][1];
+  alto ? html.setAttribute('data-contrast', 'alto') : html.removeAttribute('data-contrast');
+  osc ? html.setAttribute('data-theme', 'dark') : html.removeAttribute('data-theme');
+  $('#tContraste').setAttribute('aria-pressed', alto); $('#tContrasteTxt').textContent = alto ? 'Sí' : 'No';
+  $('#tTema').setAttribute('aria-pressed', osc); $('#tTemaTxt').textContent = osc ? 'Sí' : 'No';
+}
+function cerrarMenu() { $('#menuAcc').hidden = true; $('#btnAcc').setAttribute('aria-expanded', 'false'); }
+$('#btnAcc').addEventListener('click', () => { const m = $('#menuAcc'); m.hidden = !m.hidden; $('#btnAcc').setAttribute('aria-expanded', !m.hidden); if (!m.hidden) $('#tTexto').focus(); });
+$('#tTexto').addEventListener('click', () => { iTam = (iTam + 1) % TAM.length; guardar('tam', iTam); aplicarPrefs(); });
+$('#tContraste').addEventListener('click', () => { guardar('contraste', leer('contraste') === 'alto' ? '' : 'alto'); aplicarPrefs(); });
+$('#tTema').addEventListener('click', () => { guardar('tema', leer('tema') === 'dark' ? '' : 'dark'); aplicarPrefs(); });
+
+/* =========================================================
+   T. INICIO DEL PROGRAMA
+   ========================================================= */
+aplicarPrefs(); pintarCuentas();
+let sesion = null; try { sesion = sessionStorage.getItem('aj-sesion'); } catch (e) {}
+const cuenta = CONFIG.USUARIOS.find(c => c.usuario === sesion);
+if (cuenta) entrar(cuenta); else { $('#pantallaLogin').hidden = false; }
+setInterval(() => { if (estado.usuario && !estado.demo && !document.hidden) cargar(); }, CONFIG.ACTUALIZAR_CADA_MIN * 60000);
+</script>
+</body>
+</html>
