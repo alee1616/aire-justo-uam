@@ -428,7 +428,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 const CONFIG = {
   // Enlaces CSV de "Archivo → Compartir → Publicar en la web". Vacíos = datos de demostración.
   URL_RONDAS:   '',   // pestaña "Respuestas de formulario 1"
-  URL_REPORTES: '',   // pestaña "Respuestas de formulario 2"
+  URL_REPORTES: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTE9vYPap0FUvrCobTS7INlZd__mCp_9mM-wVd15d2xnvZYflIo1PkWOHeX2AnsIutWYRRmoTWnqqNO/pub?gid=2140275143&single=true&output=csv',   // pestaña "Respuestas de formulario 2"
   URL_FICHAS:   '',   // pestaña "Fichas de aires"
 
   // WhatsApp con código de país, sin + ni espacios (ej. '50588887777'). Vacío = WhatsApp pregunta a quién enviar.
@@ -500,7 +500,8 @@ const hora = min => { if (min == null) return '—'; const h = Math.floor(min / 
 function aFecha(s) {
   const m = String(s || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s*(.*)/);
   if (!m) { const d = new Date(s); return isNaN(d) ? null : d; }
-  const mins = aMinutos(m[4]) || 0; return new Date(+m[3], +m[2] - 1, +m[1], Math.floor(mins / 60), mins % 60);
+  let dia = +m[1], mes = +m[2]; if (mes > 12 && dia <= 12) [dia, mes] = [mes, dia]; // por si la hoja usa mes/día
+  const mins = aMinutos(m[4]) || 0; return new Date(+m[3], mes - 1, dia, Math.floor(mins / 60), mins % 60);
 }
 const fechaCorta = d => d ? d.toLocaleDateString('es-NI', { weekday: 'short', day: 'numeric', month: 'short' }) : '—';
 function haceCuanto(d) {
@@ -528,7 +529,7 @@ function leerCSV(texto) {
   const k = enc.map(norm);
   return datos.filter(f => f.some(x => x.trim())).map(f => { const o = {}; k.forEach((c, i) => o[c] = (f[i] || '').trim()); return o; });
 }
-const col = (f, titulo) => f[norm(titulo)];
+const col = (f, titulo) => { const k = norm(titulo); if (k in f) return f[k]; const otra = Object.keys(f).find(x => x.startsWith(k)); return otra ? f[otra] : undefined; };
 const aRonda = f => ({
   fecha: aFecha(col(f, 'Marca temporal')), aula: col(f, 'Aula'), ronda: String(col(f, 'Ronda') || '').trim().charAt(0),
   fin: aMinutos(col(f, 'Hora de fin de la última clase')), rev: aMinutos(col(f, 'Hora de la revisión')),
@@ -573,11 +574,15 @@ async function traer(url) {
 async function cargar() {
   const b = $('#btnActualizar'); b.classList.add('girando');
   try {
-    if (!CONFIG.URL_RONDAS) Object.assign(estado, datosDemo(), { demo: true });
+    if (!CONFIG.URL_RONDAS && !CONFIG.URL_REPORTES && !CONFIG.URL_FICHAS) Object.assign(estado, datosDemo(), { demo: true });
     else {
-      const [r, q, f] = await Promise.all([traer(CONFIG.URL_RONDAS), CONFIG.URL_REPORTES ? traer(CONFIG.URL_REPORTES) : [], CONFIG.URL_FICHAS ? traer(CONFIG.URL_FICHAS) : []]);
-      estado.rondas = r.map(aRonda).filter(x => x.aula); estado.reportes = q.map(aReporte).filter(x => x.aula);
-      estado.fichas = aFichas(f); estado.demo = false;
+      // Cada pestaña que no tenga enlace se completa con los datos simulados del piloto
+      const sim = datosDemo();
+      const [r, q, f] = await Promise.all([CONFIG.URL_RONDAS ? traer(CONFIG.URL_RONDAS) : null, CONFIG.URL_REPORTES ? traer(CONFIG.URL_REPORTES) : null, CONFIG.URL_FICHAS ? traer(CONFIG.URL_FICHAS) : null]);
+      estado.rondas = r ? r.map(aRonda).filter(x => x.aula) : sim.rondas;
+      estado.reportes = q ? q.map(aReporte).filter(x => x.aula) : sim.reportes;
+      estado.fichas = f ? aFichas(f) : sim.fichas;
+      estado.demo = false; estado.conectado = { rondas: !!r, reportes: !!q, fichas: !!f };
     }
     estado.error = null; estado.actualizado = new Date();
   } catch (e) { estado.error = e.message || 'Error al cargar los datos'; }
@@ -1038,6 +1043,10 @@ function pintarEstado() {
 function pintarAvisos() {
   let h = '';
   if (estado.demo) h += `<div class="aviso demo" role="note">${ico(I.alerta, 22)}<div><strong>Datos simulados del piloto (9 al 20 de noviembre de 2026).</strong>No son mediciones reales: muestran cómo funcionaría el sistema. Para usar datos reales, se pegan los enlaces CSV de la hoja en la configuración del código.</div></div>`;
+  if (!estado.demo && estado.conectado) {
+    const c = estado.conectado, vivo = [c.reportes && 'los reportes del QR', c.rondas && 'las rondas', c.fichas && 'las fichas'].filter(Boolean).join(', ');
+    h += `<div class="aviso demo" role="note">${ico(I.alerta, 22)}<div><strong>Conectado a la hoja de Google: ${vivo} se leen en vivo.</strong>Los reportes nuevos aparecen al tocar Actualizar (o solos cada ${CONFIG.ACTUALIZAR_CADA_MIN} minutos). Los datos del 9 al 20 de noviembre de 2026 son simulados${c.rondas && c.reportes && c.fichas ? '' : ', y lo que no está conectado sigue mostrando los datos simulados del piloto'}.</div></div>`;
+  }
   if (estado.error) h += `<div class="aviso error" role="alert">${ico(I.alerta, 22)}<div><strong>No se pudieron cargar los datos.</strong>${esc(estado.error)}. Revisá la conexión o que la hoja siga publicada.</div></div>`;
   $('#avisos').innerHTML = h;
 }
